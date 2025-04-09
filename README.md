@@ -10,5 +10,5 @@
 2. Run basic_agent_gemini file
 
 ## Create a Calendar Event in JSON
-1. Navigate to StructureOutput directory
-2. Run structured_output file
+1. Navigate to SchedulerAgent directory
+2. Run scheduler_agent file

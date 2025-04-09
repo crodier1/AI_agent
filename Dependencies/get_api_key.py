@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 import os
 
 
-def get_open_ai_key():
+def get_weather_api_key():
     load_dotenv()
-    return os.getenv('OPENAI_API_KEY')
+    return os.getenv('WEATHER_API_KEY')
 
 
 def get_gemini_key():
