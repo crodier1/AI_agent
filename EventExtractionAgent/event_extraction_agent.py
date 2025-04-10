@@ -36,11 +36,21 @@ def event_extraction(user_input):
         return json.dumps(json_response, indent=2)  # Return as formatted JSON string
 
     except json.JSONDecodeError:
-        print("Error: Could not parse the model's response as valid JSON.")
-        print("Raw Response:", response.text)
+        # print("Error: Could not parse the model's response as valid JSON.")
+        # print("Raw Response:", response.text)
         return json.dumps(error_response, indent=2)
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        # print(f"An unexpected error occurred: {e}")
         return json.dumps(error_response, indent=2)
 
 
+def event_is_valid(event):
+    return 'error' not in event
+
+
+def confirm_event(event):
+    return f"Event Name: {get_event_value(event, 'name', 'No event name')}\nDate: {get_event_value(event, 'date', 'No Date')}\nParticipants: {', '.join(event['participants']) if event['participants'] else 'No participants'}\nIs this correct? (y/n) "
+
+
+def get_event_value(event, key, key_missing):
+    return f"{event[key] if event[key] else key_missing}"
