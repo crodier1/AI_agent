@@ -10,7 +10,7 @@
 
 ## Event Extraction Agent
 1. Navigate to EventExtractionAgent directory
-2. Run event_extraction_agent 
+2. Run create_events 
 
 ## Weather Agent
 1. Get an API key from https://www.weatherapi.com/

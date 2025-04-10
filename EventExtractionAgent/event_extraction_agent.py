@@ -1,45 +1,46 @@
 import google.generativeai as genai
-from Dependencies.CalendarEvent import CalendarEvent
 import json
 from Dependencies.get_api_key import get_gemini_key
 
 genai.configure(api_key=get_gemini_key())
 
-model = genai.GenerativeModel('models/gemini-1.5-pro-latest')  # Or another recommended model
+model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
 
-while True:
-    user_prompt = input("Please provide the name of you next event, the date, and who is going. ")
 
-    if not user_prompt:
-        continue
-
+def event_extraction(user_input):
     prompt = f"""
-    Extract the event information from the following text and return it as a JSON object that conforms to this Python class:
+        Extract the event information from the following text and return it as a JSON object with the following format:
 
-    class CalendarEvent(BaseModel):
-        name: str
-        date: str
-        participants: list[str]
+        {{'name': 'string name of event', 'date': 'string date of event', 'participants': ['participant1', 'participant2']}}
 
-    Text: {user_prompt}
+        Text: {user_input}
 
-    JSON:
-    """
+        JSON:        
+        """
+
+    error_response = {'error': "Unable to extract data based on the information provided"}
 
     try:
         response = model.generate_content(prompt)
 
-        json_response = json.loads(response.text)
-        calendar_event = CalendarEvent(**json_response)
-        print(calendar_event.json(indent=2))
+        # Check if response is empty or None
+        if not response or not response.text:
+            print("Error: Model returned an empty response.")
+            return error_response
+
+        # Clean the response text to remove any leading/trailing whitespace or ```json blocks
+        cleaned_response = response.text.strip()
+        cleaned_response = cleaned_response.removeprefix("```json").removesuffix("```").strip()
+
+        json_response = json.loads(cleaned_response)
+        return json.dumps(json_response, indent=2)  # Return as formatted JSON string
 
     except json.JSONDecodeError:
         print("Error: Could not parse the model's response as valid JSON.")
         print("Raw Response:", response.text)
+        return json.dumps(error_response, indent=2)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
+        return json.dumps(error_response, indent=2)
 
-    end_chat = input("Would you like to plan another event (y/n)? ")
 
-    if end_chat and end_chat.lower() == 'n':
-        break
