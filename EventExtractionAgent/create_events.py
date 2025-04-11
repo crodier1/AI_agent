@@ -1,6 +1,8 @@
 import json
-
 from EventExtractionAgent.event_extraction_agent import event_extraction, event_is_valid, confirm_event
+from EventExtractionAgent.update_calendar_events import manage_calendar_events
+
+calendar_events = []
 
 question = "Please provide the name of you next event, the date, and who is going. "
 
@@ -17,6 +19,10 @@ while True:
         continue
 
     validate_event = input(confirm_event(response))
+
+    if validate_event and validate_event == 'y':
+        calendar_events, _ = manage_calendar_events(calendar_events, response)
+        print('calendar events:', calendar_events)
 
     if validate_event and validate_event.lower() == 'n':
         continue
