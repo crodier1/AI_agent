@@ -1,6 +1,7 @@
 import json
 import google.generativeai as genai
 from Dependencies.get_api_key import get_gemini_key
+from fuzzywuzzy import fuzz
 
 genai.configure(api_key=get_gemini_key())
 model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
@@ -25,10 +26,16 @@ def manage_calendar_events(calendar_events, new_event):
         return [new_event], "added"  # If the list is empty, just add the event
 
     for i, existing_event in enumerate(calendar_events):
-        if events_are_similar(existing_event, new_event):
-            updated_event = merge_event_details(existing_event, new_event)
-            calendar_events[i] = updated_event
+
+        similarity_ratio = fuzz.ratio(new_event["name"].lower(), existing_event["name"].lower())
+        if similarity_ratio > 80:
+            calendar_events[i] = new_event
             return calendar_events, "updated"
+
+        # if events_are_similar(existing_event, new_event):
+        #     updated_event = merge_event_details(existing_event, new_event)
+        #     calendar_events[i] = updated_event
+        #     return calendar_events, "updated"
 
     calendar_events.append(new_event)
     return calendar_events, "added"
@@ -93,3 +100,7 @@ def merge_event_details(existing_event, new_event):
     merged_event["participants"] = merged_participants
 
     return merged_event
+
+
+def normalize_event_name(name):
+    return name.lower().strip()
